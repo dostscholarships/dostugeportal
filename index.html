@@ -81,7 +81,7 @@ const SESS=['Day 1 (AM)','Day 1 (PM)','Day 2 (AM)','Day 2 (PM)'],ROLES=['Supervi
 const $=s=>document.querySelector(s),esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 let TOK='',ME=null,PAGE='',USERS=[],mode='login';
 try{TOK=sessionStorage.getItem('t')||''}catch(e){}
-const API='PASTE_YOUR_WEB_APP_URL_HERE'; // Apps Script Web app URL (ends with /exec)
+const API='https://script.google.com/macros/s/AKfycbz46rp-pPUqgWpMYfT9AQre7ATnKzuVGgXPPVs7hrvvhIzRLqu9lIswUuzffyVxh-J4Dw/exec'; // Apps Script Web app URL (ends with /exec)
 const call=async(fn,a={})=>{let r;try{const x=await fetch(API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({fn,t:TOK,a})});r=await x.json()}catch(e){throw 'Cannot reach the server. Check the API URL and your connection.'}if(!r.ok)throw r.e;return r.d};
 let tt;function toast(m){const t=$('#toast');t.textContent=m;t.style.display='block';clearTimeout(tt);tt=setTimeout(()=>t.style.display='none',3200)}
 const err=e=>toast(e);
