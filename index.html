@@ -2,77 +2,86 @@
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>DOST UGE Portal</title>
-<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<script>try{var d=document.documentElement.dataset;d.theme=localStorage.getItem('th')||(matchMedia('(prefers-color-scheme:dark)').matches?'night':'light');d.deco=localStorage.getItem('dc')||'waves'}catch(e){document.documentElement.dataset.theme='light';document.documentElement.dataset.deco='waves'}</script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
-:root{--c:#00AEEF;--k:#000;--w:#fff;--y:#FAC608;--line:rgba(0,174,239,.35);--dim:rgba(255,255,255,.62);--panel:#07131a}
-*{box-sizing:border-box}html,body{margin:0;height:100%}
-body{background:var(--k);color:var(--w);font:15px/1.5 'IBM Plex Sans',sans-serif;
-background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);background-size:48px 48px;background-position:-1px -1px;background-blend-mode:soft-light}
-body::before{content:"";position:fixed;inset:0;background:radial-gradient(circle at 50% 0,rgba(0,174,239,.16),#000 70%);z-index:-1}
-h1,h2,h3,.brand{font-family:'Chakra Petch',sans-serif;letter-spacing:.02em;margin:0}
-button,input,select{font:inherit}
-.btn{background:var(--c);color:#000;border:0;padding:9px 16px;font-weight:600;cursor:pointer;clip-path:polygon(8px 0,100% 0,100% calc(100% - 8px),calc(100% - 8px) 100%,0 100%,0 8px)}
-.btn:hover{background:var(--y)}.btn.ghost{background:transparent;color:var(--c);box-shadow:inset 0 0 0 1px var(--c)}
-.btn.ghost:hover{background:var(--c);color:#000}.btn.warn{background:var(--y)}.btn.sm{padding:5px 10px;font-size:13px}
+:root{--grad:linear-gradient(160deg,#00AEEF 0%,#0087B8 45%,#00364D 100%);--wave:#fff;--dotc:rgba(255,255,255,.34);--card:#fff;--ink:#000;--mut:#5A6A72;--line:#DDE5E9;--soft:#EAF7FD;--btn:#000;--btnt:#fff;--lnk:#00709F;--c:#00AEEF;--y:#FAC608;--pink:#E64C93;--sh:0 24px 60px -22px rgba(0,28,42,.6);--f:'Inter',system-ui,-apple-system,'Segoe UI',sans-serif}
+[data-theme=classic]{--grad:linear-gradient(160deg,#FFF9E0 0%,#F7E9A8 55%,#F2D14F 120%);--wave:#FAC608;--dotc:rgba(122,95,0,.28);--card:#FFFEF8;--mut:#6B6140;--line:#EADFB5;--soft:#FFF4C9;--lnk:#7A5F00;--sh:0 24px 60px -24px rgba(90,70,0,.5)}
+[data-theme=night]{--grad:linear-gradient(160deg,#00364D 0%,#001A26 42%,#000 100%);--wave:#00AEEF;--dotc:rgba(0,174,239,.3);--card:#0A0D10;--ink:#fff;--mut:#9FB0B8;--line:#1D2A31;--soft:#0E1D26;--btn:#00AEEF;--btnt:#000;--lnk:#3CC4F5;--sh:0 24px 60px -22px rgba(0,0,0,.9)}
+*{box-sizing:border-box}html{min-height:100%;background:var(--grad) fixed}body{margin:0;min-height:100vh;color:var(--ink);font:15px/1.55 var(--f);background:transparent}
+h1,h2,h3,p{margin:0}h1,h2,h3,button,input,select,label{font-family:var(--f)}
+#deco{position:fixed;inset:0;z-index:-1;pointer-events:none}.dots{position:absolute;inset:0;background-image:radial-gradient(var(--dotc) 1.3px,transparent 1.8px);background-size:28px 28px}
+.wv{position:absolute;left:0;bottom:0;width:100%;height:42vh}.wv path{fill:var(--wave)}
+[data-deco=none] #deco{display:none}[data-deco=dots] .wv{display:none}[data-deco=waves] .dots{display:none}
+/* controls */
+.btn{background:var(--btn);color:var(--btnt);border:0;padding:9px 18px;font-weight:600;cursor:pointer;border-radius:10px;transition:background .15s,color .15s}
+.btn:hover{background:var(--y);color:#000}.btn.ghost{background:transparent;color:var(--ink);box-shadow:inset 0 0 0 1px var(--line)}.btn.ghost:hover{box-shadow:inset 0 0 0 1px var(--c);background:var(--soft);color:var(--ink)}
+.btn.warn{background:var(--y);color:#000}.btn.warn:hover{background:var(--c)}.btn.sm{padding:5px 12px;font-size:13px;border-radius:8px}.btn:disabled{opacity:.5}
+.btn.block{width:100%;padding:16px;font-size:17px;border-radius:12px;margin-top:14px}
 :focus-visible{outline:2px solid var(--y);outline-offset:2px}
-input,select{background:#000;color:var(--w);border:1px solid var(--c);padding:9px 11px;width:100%;border-radius:0}
-label{display:block;margin:12px 0 4px;color:var(--dim);font-size:13px}
-.msg{margin-top:12px;padding:9px 12px;border-left:3px solid var(--y);background:rgba(250,198,8,.1)}.msg.ok{border-color:var(--c);background:rgba(0,174,239,.12)}
+.fld,.row>div,.grid>div{border:1px solid var(--line);border-radius:12px;padding:8px 14px 9px;background:var(--card);position:relative}.fld{margin-top:14px}
+.fld:focus-within,.row>div:focus-within,.grid>div:focus-within{border-color:var(--c);box-shadow:0 0 0 3px var(--soft)}
+label{display:block;color:var(--mut);font-size:13px;font-weight:500}
+input,select{background:transparent;color:var(--ink);border:0;padding:3px 0 0;width:100%;font-size:15px;outline:0}select option{background:var(--card);color:var(--ink)}
+.pwf input{padding-right:36px}.eye{position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:0;color:var(--lnk);cursor:pointer;width:32px;height:32px}.eye svg{width:22px;height:22px}
+.link{background:none;border:0;color:var(--lnk);cursor:pointer;padding:0;font-weight:600;font-size:15px}.link:hover{text-decoration:underline}
+.rt{text-align:right;margin-top:14px}.alt{text-align:center;margin-top:16px}
+.msg{margin-top:14px;padding:10px 14px;border-radius:10px;background:var(--soft);box-shadow:inset 3px 0 var(--y)}.msg.ok{box-shadow:inset 3px 0 var(--c)}
+.seg{display:flex;border:1px solid var(--line);border-radius:12px;padding:4px;gap:2px}.seg button{flex:1;border:0;background:none;border-radius:9px;padding:9px 6px;color:var(--mut);font-weight:600;font-size:14px;cursor:pointer}.seg button.on{background:var(--btn);color:var(--btnt)}
 /* auth */
-#auth{min-height:100%;display:grid;place-items:center;padding:20px}
-.card{width:min(440px,100%);background:rgba(0,0,0,.85);border:1px solid var(--c);padding:28px;position:relative;box-shadow:0 0 40px rgba(0,174,239,.18)}
-.card::before,.card::after{content:"";position:absolute;width:18px;height:18px;border:3px solid var(--y)}
-.card::before{top:-3px;left:-3px;border-right:0;border-bottom:0}.card::after{bottom:-3px;right:-3px;border-left:0;border-top:0}
-.brand{font-size:26px;color:var(--c)}.brand b{color:var(--y)}.sub{color:var(--dim);margin:2px 0 18px}
-.tabs{display:flex;gap:4px;margin-bottom:6px;flex-wrap:wrap}.tabs button{background:none;border:0;border-bottom:2px solid transparent;color:var(--dim);padding:6px 10px;cursor:pointer}
-.tabs button.on{color:var(--w);border-color:var(--y)}
-.link{background:none;border:0;color:var(--c);cursor:pointer;padding:0;margin-top:12px;text-decoration:underline}
-/* app shell */
-#app{display:none;height:100%}
-header{display:flex;align-items:center;gap:12px;padding:10px 16px;border-bottom:1px solid var(--c);background:rgba(0,0,0,.9);position:sticky;top:0;z-index:5}
-header .t{flex:1;font-family:'Chakra Petch';font-size:18px}header .t b{color:var(--y)}
-.ico{background:none;border:1px solid var(--c);color:var(--c);width:40px;height:40px;font-size:20px;cursor:pointer}
-.ico:hover{background:var(--c);color:#000}
-.side{position:fixed;top:0;bottom:0;width:270px;background:var(--panel);border:solid var(--c);border-width:0 1px;z-index:8;padding:18px;transition:transform .25s;overflow:auto}
-#left{left:0;transform:translateX(-102%)}#right{right:0;transform:translateX(102%)}
-.side.open{transform:none}#scrim{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:7;display:none}#scrim.on{display:block}
-.nav a{display:block;padding:11px 12px;color:var(--w);text-decoration:none;border-left:3px solid transparent;cursor:pointer}
-.nav a:hover{background:rgba(0,174,239,.15)}.nav a.on{border-color:var(--y);background:rgba(0,174,239,.2);color:var(--y)}
-.nav h4{margin:18px 0 4px;color:var(--dim);font-weight:500;font-size:13px}
-main{padding:20px;max-width:1100px;margin:auto}
-.panel{background:rgba(0,0,0,.82);border:1px solid var(--line);padding:18px;margin-bottom:18px}
-.row{display:flex;gap:10px;flex-wrap:wrap;align-items:end}.row>*{flex:1;min-width:130px}.row>.btn{flex:0 0 auto}
-.pill{display:inline-block;padding:2px 10px;border:1px solid var(--c);color:var(--c);font-size:13px}
-.pill.y{border-color:var(--y);color:var(--y)}
-.who{width:64px;height:64px;border:2px solid var(--y);display:grid;place-items:center;font:700 26px 'Chakra Petch';color:var(--y);margin-bottom:10px}
-/* tables */
+#auth{min-height:100vh;display:grid;place-items:center;padding:56px 18px 28px}
+.card{width:min(460px,100%);background:var(--card);border-radius:22px;padding:58px 32px 28px;position:relative;box-shadow:var(--sh)}
+.badge{position:absolute;left:50%;top:-34px;transform:translateX(-50%);width:68px;height:68px;border-radius:18px;background:#000;display:grid;place-items:center;box-shadow:0 0 0 6px var(--card)}
+.badge svg{width:38px;height:38px;color:var(--c)}
+.brand{font-size:34px;font-weight:700;color:var(--lnk);text-align:center;letter-spacing:.01em;line-height:1.15}
+#ah{text-align:center;margin:22px 0 6px}#ah h2{font-size:24px;font-weight:700;margin:0}.sub{color:var(--mut);font-size:14px;margin-top:3px}
+.ctl{border-top:1px solid var(--line);margin-top:28px;padding-top:22px;display:grid;gap:10px}
+/* app */
+#app{display:none}
+header{display:flex;align-items:center;gap:12px;padding:10px 12px;margin:12px;background:var(--card);border-radius:16px;position:sticky;top:12px;z-index:5;box-shadow:var(--sh)}
+header .t{flex:1;text-align:center;font-weight:700;font-size:20px;color:var(--lnk);letter-spacing:.01em}svg.mark{width:24px;height:24px;color:var(--c);vertical-align:-5px;margin-right:8px}
+.ico{background:none;border:1px solid var(--line);color:var(--ink);width:42px;height:42px;cursor:pointer;display:grid;place-items:center;border-radius:12px}.ico:hover,.ico[aria-expanded=true]{border-color:var(--c);background:var(--soft)}.ico svg{width:20px;height:20px}
+.side{position:fixed;top:12px;bottom:12px;width:min(300px,86vw);background:var(--card);z-index:8;padding:20px;transition:transform .25s;overflow:auto;visibility:hidden;border-radius:18px;box-shadow:var(--sh)}
+#left{left:12px;transform:translateX(-115%)}#right{right:12px;transform:translateX(115%)}#left.open,#right.open{transform:none;visibility:visible}
+.sh{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}.ttl{font-size:20px;font-weight:700}
+#scrim{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:7;display:none}#scrim.on{display:block}
+.nav a{display:block;padding:11px 14px;color:var(--ink);text-decoration:none;border-radius:10px;cursor:pointer;margin-bottom:2px}.nav a:hover{background:var(--soft)}.nav a.on{background:var(--soft);color:var(--lnk);font-weight:600;box-shadow:inset 3px 0 var(--y)}
+.nav h4{margin:18px 0 6px 4px;color:var(--mut);font-size:13px;font-weight:600}
+main{padding:14px 12px 40px;max-width:1100px;margin:auto}
+main>h2{display:inline-block;background:var(--card);padding:10px 22px;border-radius:14px;font-size:24px;font-weight:700;margin-bottom:16px;box-shadow:var(--sh)}
+.panel{background:var(--card);border-radius:16px;padding:22px;margin-bottom:16px;box-shadow:var(--sh)}.panel h3{font-size:20px;font-weight:700;margin-bottom:10px}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:stretch}.row>*{flex:1;min-width:140px}.row>.btn{flex:0 0 auto;display:flex;align-items:center;justify-content:center;padding:0 22px}
+.pill{display:inline-block;padding:1px 11px;border:1px solid var(--c);color:var(--lnk);font-size:13px;border-radius:20px;font-weight:500}.pill.y{border-color:var(--y);background:rgba(250,198,8,.28);color:var(--ink)}
+.who{width:60px;height:60px;display:grid;place-items:center;font:700 26px var(--f);margin-bottom:10px;border-radius:50%;background:var(--btn);color:var(--btnt);box-shadow:0 0 0 4px var(--soft)}
+.cap{margin:16px 0 6px}
 .wrap{overflow-x:auto}table{border-collapse:collapse;width:100%}
-th{background:var(--c);color:#000;text-align:left;padding:9px 10px;font-family:'Chakra Petch'}
-td{padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:middle}
-tr.rm td{background:rgba(250,198,8,.14);color:var(--y);font-weight:600}tr.det td{background:rgba(0,174,239,.08)}
-tr.dup td{background:rgba(250,198,8,.12)}
-.short{display:none}.sx{font-weight:600}.sx.m{color:var(--c)}.sx.f{color:#ff7ab8}
-.slot{width:110px;text-align:center}
+th{text-align:left;padding:10px;font-size:13px;font-weight:600;color:var(--mut);border-bottom:2px solid var(--c);white-space:nowrap}
+td{padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:middle}tr.det td{background:var(--soft)}tr.dup td{background:rgba(250,198,8,.22)}
+.short{display:none}.sx{font-weight:600}.sx.m{color:var(--lnk)}.sx.f{color:var(--pink)}
+td input.slot{width:110px;text-align:center;border:1px solid var(--line);border-radius:8px;padding:6px}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:10px}
-.empty{color:var(--dim);padding:24px;text-align:center;border:1px dashed var(--line)}
-#toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:var(--y);color:#000;padding:10px 18px;z-index:20;display:none;font-weight:600;max-width:90vw}
-@media(min-width:1100px){#left,#right{transform:none}body.app main{margin:0 290px 0 290px;max-width:none}.ico{display:none}header{padding-left:290px;padding-right:290px}#scrim{display:none!important}}
-@media(max-width:700px){.full{display:none}.short{display:inline}
-.sx{display:inline-block;width:16px;height:16px;border-radius:50%;font-size:0;vertical-align:middle}.sx.m{background:var(--c)}.sx.f{background:#ff7ab8}
-td,th{padding:7px 6px;font-size:14px}main{padding:12px}.slot{width:84px}}
+.empty{color:var(--mut);padding:26px;text-align:center;border:1px dashed var(--line);border-radius:12px}
+#toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--ink);color:var(--card);border-radius:12px;box-shadow:inset 4px 0 var(--y);padding:11px 20px;z-index:20;display:none;max-width:90vw;font-weight:500}
+@media(max-width:700px){.full{display:none}.short{display:inline}.sx{display:inline-block;width:16px;height:16px;border-radius:50%;font-size:0;vertical-align:middle}.sx.m{background:var(--c)}.sx.f{background:var(--pink)}
+td,th{padding:8px 6px;font-size:14px}.card{padding:56px 22px 24px}.brand{font-size:30px}main>h2{font-size:21px}header .t{font-size:18px}}
 @media(prefers-reduced-motion:reduce){.side{transition:none}}
 </style></head><body>
+<div id="deco"><div class="dots"></div><svg class="wv" viewBox="0 0 1440 320" preserveAspectRatio="none" aria-hidden="true"><path opacity=".13" d="M0,200 C240,110 480,100 720,160 C960,220 1200,240 1440,140 L1440,320 L0,320Z"/><path opacity=".17" d="M0,255 C300,190 560,235 800,255 C1040,275 1260,235 1440,205 L1440,320 L0,320Z"/><path opacity=".22" d="M0,292 C320,255 640,302 960,282 C1180,268 1320,252 1440,264 L1440,320 L0,320Z"/></svg></div>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><symbol id="atom" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.1"><ellipse cx="12" cy="12" rx="10.5" ry="4.2"/><ellipse cx="12" cy="12" rx="10.5" ry="4.2" transform="rotate(60 12 12)"/><ellipse cx="12" cy="12" rx="10.5" ry="4.2" transform="rotate(120 12 12)"/><circle cx="12" cy="12" r="1.9" fill="#FAC608" stroke="none"/></symbol></svg>
 
 <div id="auth"><div class="card">
-<div class="brand">DOST <b>UGE</b> Portal</div><p class="sub">Examination day coordination</p>
-<div class="tabs" id="tabs"></div>
+<div class="badge"><svg><use href="#atom"/></svg></div>
+<h1 class="brand">DOST UGE</h1><div id="ah"></div>
 <div id="f"></div><div id="amsg"></div>
+<div class="ctl"><div class="themes seg" aria-label="Theme"></div><div class="decos seg" aria-label="Background decoration"></div></div>
 </div></div>
 
 <div id="app">
-<header><button class="ico" id="mL" aria-label="Open pages">&#9776;</button><div class="t">DOST <b>UGE</b></div><button class="ico" id="mR" aria-label="Open profile">&#9679;</button></header>
-<aside class="side" id="left"><div class="brand" style="margin-bottom:12px">Pages</div><nav class="nav" id="nav"></nav></aside>
+<header><button class="ico" id="mL" aria-label="Pages menu" aria-expanded="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+<div class="t"><svg class="mark"><use href="#atom"/></svg>DOST UGE</div>
+<button class="ico" id="mR" aria-label="Profile" aria-expanded="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="8" r="4"/><path d="M4 21c1-5 4-7 8-7s7 2 8 7"/></svg></button></header>
+<aside class="side" id="left"><div class="sh"><span class="ttl">Pages</span><button class="ico" data-close aria-label="Close">&#10005;</button></div><nav class="nav" id="nav"></nav></aside>
 <aside class="side" id="right"></aside><div id="scrim"></div>
 <main id="main"></main></div><div id="toast"></div>
 
@@ -88,18 +97,27 @@ const err=e=>toast(e);
 const isRole=(...r)=>ME&&ME.roleStatus==='approved'&&r.includes(ME.role);
 
 /* ---------- auth ---------- */
-const TABS={login:'Log in',signup:'Sign up',verify:'Verify email',forgot:'Forgot password'};
+const THEMES={light:'Light',classic:'Classic',night:'Night'},DECOS={none:'None',dots:'Dots',waves:'Waves',both:'Both'};
+function setTheme(t){document.documentElement.dataset.theme=t;try{localStorage.setItem('th',t)}catch(e){}themeUI()}
+function setDeco(d){document.documentElement.dataset.deco=d;try{localStorage.setItem('dc',d)}catch(e){}themeUI()}
+function themeUI(){const D=document.documentElement.dataset;
+  const seg=(el,O,cur,at)=>el.innerHTML=Object.keys(O).map(k=>`<button ${at}="${k}" class="${k===cur?'on':''}" aria-pressed="${k===cur}">${O[k]}</button>`).join('');
+  document.querySelectorAll('.themes').forEach(el=>seg(el,THEMES,D.theme,'data-t'));document.querySelectorAll('.decos').forEach(el=>seg(el,DECOS,D.deco,'data-dc'))}
+const FORMS={login:['Welcome back','Log in to continue'],signup:['Create your account','Your email is confirmed by the administrator'],forgot:['Reset password','We will email you a reset code'],reset:['Choose a new password','Enter the code from your email']};
+const fld=(id,l,type,x)=>`<div class="fld"><label for="${id}">${l}</label><input id="${id}" type="${type||'text'}" ${x||''}></div>`;
 function authUI(){
-  $('#tabs').innerHTML=Object.keys(TABS).map(k=>`<button class="${k===mode||(mode==='reset'&&k==='forgot')?'on':''}" data-m="${k}">${TABS[k]}</button>`).join('');
-  const em='<label for="em">Email address</label><input id="em" type="email" autocomplete="email">';
-  const pw=l=>`<label for="pw">${l}</label><input id="pw" type="password" autocomplete="current-password">`;
-  const cd='<label for="cd">6-digit code</label><input id="cd" inputmode="numeric" maxlength="6">';
-  const nm='<label for="nm">Full name</label><input id="nm" autocomplete="name">';
-  const B=(t)=>`<p><button class="btn" id="go">${t}</button></p>`;
-  $('#f').innerHTML={login:em+pw('Password')+B('Log in'),signup:nm+em+pw('Password (8+ characters)')+B('Create account')+'<p class="sub">A verification code is sent to dost.scholarships@ateneo.edu.</p>',
-   verify:em+cd+B('Verify email'),forgot:em+B('Send reset code')+'<button class="link" data-m="reset">I already have a code</button>',reset:em+cd+pw('New password')+B('Change password')}[mode];
-  $('#tabs').onclick=$('#f').onclick=e=>{const m=e.target.dataset.m;if(m){mode=m;$('#amsg').innerHTML='';authUI()}};
-  $('#go').onclick=submitAuth;
+  $('#ah').innerHTML=`<h2>${FORMS[mode][0]}</h2><p class="sub">${FORMS[mode][1]}</p>`;
+  const em=fld('em','Email address','email','autocomplete="email"'),cd=fld('cd','6-digit code','text','inputmode="numeric" maxlength="6"'),nm=fld('nm','Full name','text','autocomplete="name"');
+  const pw=l=>`<div class="fld pwf"><label for="pw">${l}</label><input id="pw" type="password" autocomplete="current-password"><button type="button" class="eye" id="eye" aria-label="Show or hide password"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg></button></div>`;
+  const go=t=>`<button class="btn block" id="go">${t}</button>`,L=(m,t)=>`<button type="button" class="link" data-m="${m}">${t}</button>`,alt=(m,t)=>`<p class="alt">${L(m,t)}</p>`;
+  $('#f').innerHTML={login:em+pw('Password')+`<div class="rt">${L('forgot','Forgot password?')}</div>`+go('Log in')+alt('signup','Need an account? Sign up'),
+   signup:nm+em+pw('Password (8+ characters)')+go('Create account')+alt('login','Already registered? Log in'),
+   forgot:em+go('Send reset code')+alt('reset','I already have a code')+alt('login','Back to log in'),
+   reset:em+cd+pw('New password')+go('Change password')+alt('login','Back to log in')}[mode];
+  $('#f').onclick=e=>{const m=e.target.dataset.m;if(m){mode=m;$('#amsg').innerHTML='';authUI()}};
+  $('#f').onkeydown=e=>{if(e.key==='Enter')$('#go').click()};
+  const eye=$('#eye');if(eye)eye.onclick=()=>{const p=$('#pw');p.type=p.type==='password'?'text':'password'};
+  $('#go').onclick=submitAuth;themeUI();
 }
 async function submitAuth(){
   const g=i=>($('#'+i)||{}).value||'';const a={email:g('em'),password:g('pw'),name:g('nm'),code:g('cd')};
@@ -107,7 +125,7 @@ async function submitAuth(){
   $('#go').disabled=true;
   try{
     if(mode==='login'){const r=await call('login',a);TOK=r.token;ME=r.me;try{sessionStorage.setItem('t',TOK)}catch(e){}boot()}
-    else{const t=await call(mode,a);msg(t,1);if(mode==='signup')mode='verify',setTimeout(authUI,0),setTimeout(()=>msg(t,1),10);else if(mode==='reset'||mode==='verify'){mode='login';setTimeout(()=>{authUI();msg(t,1)},0)}}
+    else{const t=await call(mode,a);if(mode==='forgot')msg(t,1);else{mode='login';setTimeout(()=>{authUI();msg(t,1)},0)}}
   }catch(e){msg(e)}
   const b=$('#go');if(b)b.disabled=false;
 }
@@ -125,18 +143,23 @@ function nav(){
 }
 function profile(){
   const st=ME.roleStatus;
-  $('#right').innerHTML=`<div class="who">${esc((ME.name||'?')[0].toUpperCase())}</div><h3>${esc(ME.name)}</h3><div style="color:var(--dim);word-break:break-all">${esc(ME.email)}</div>
+  $('#right').innerHTML=`<div class="sh"><span class="ttl">Profile</span><button class="ico" data-close aria-label="Close">&#10005;</button></div><div class="who">${esc((ME.name||'?')[0].toUpperCase())}</div><h3>${esc(ME.name)}</h3><div style="color:var(--mut);word-break:break-all">${esc(ME.email)}</div>
   <p>${ME.role?`<span class="pill ${st==='approved'?'':'y'}">${esc(ME.role)} (${esc(st)})</span>`:'<span class="pill y">No role yet</span>'}${ME.owner?' <span class="pill">Owner</span>':''}</p>
-  <label for="rs">Assign yourself a role</label><select id="rs">${ROLES.map(r=>`<option ${r===ME.role?'selected':''}>${r}</option>`).join('')}</select>
+  <div class="fld"><label for="rs">Assign yourself a role</label><select id="rs">${ROLES.map(r=>`<option ${r===ME.role?'selected':''}>${r}</option>`).join('')}</select></div>
   <p><button class="btn sm" id="sr">Request role</button></p>
-  <p style="color:var(--dim);font-size:13px">${ME.owner?'Owner roles apply immediately.':'Role requests are sent to dost.scholarships@ateneo.edu for approval.'}</p>
-  <p><button class="btn ghost sm" id="lo">Log out</button></p>`;
+  <p style="color:var(--mut);font-size:13px">${ME.owner?'Owner roles apply immediately.':'Role requests are sent to dost.scholarships@ateneo.edu for approval.'}</p>
+  <label class="cap">Appearance</label><div class="themes seg"></div><div class="decos seg" style="margin-top:8px"></div>
+  <p style="margin-top:22px"><button class="btn ghost sm" id="lo">Log out</button></p>`;
+  themeUI();
   $('#sr').onclick=async()=>{try{ME=await call('setRole',{role:$('#rs').value});toast(ME.roleStatus==='approved'?'Role set':'Role sent for approval');nav();profile();go(PAGE)}catch(e){err(e)}};
   $('#lo').onclick=async()=>{try{await call('logout')}catch(e){}TOK='';try{sessionStorage.removeItem('t')}catch(e){}location.reload()};
 }
-const side=(id,on)=>{$(id).classList.toggle('open',on);$('#scrim').classList.toggle('on',on)};
-$('#mL').onclick=()=>side('#left',1);$('#mR').onclick=()=>side('#right',1);$('#scrim').onclick=()=>{side('#left',0);side('#right',0)};
-$('#nav').onclick=e=>{const p=e.target.dataset.p;if(p){go(p);side('#left',0)}};
+const closeAll=()=>{['#left','#right'].forEach(i=>$(i).classList.remove('open'));$('#scrim').classList.remove('on');['#mL','#mR'].forEach(i=>$(i).setAttribute('aria-expanded','false'))};
+function toggle(id,btn){const o=$(id).classList.contains('open');closeAll();if(!o){$(id).classList.add('open');$('#scrim').classList.add('on');$(btn).setAttribute('aria-expanded','true')}}
+$('#mL').onclick=()=>toggle('#left','#mL');$('#mR').onclick=()=>toggle('#right','#mR');$('#scrim').onclick=closeAll;
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeAll()});
+document.addEventListener('click',e=>{if(e.target.closest('[data-close]'))closeAll();const t=e.target.dataset&&e.target.dataset.t;if(t)setTheme(t);const dc=e.target.dataset&&e.target.dataset.dc;if(dc)setDeco(dc)});
+$('#nav').onclick=e=>{const p=e.target.dataset.p;if(p){go(p);closeAll()}};
 function go(p){
   PAGE=p;document.querySelectorAll('#nav a').forEach(a=>a.classList.toggle('on',a.dataset.p===p));
   if(SESS.includes(p))sessionPage(p);else if(p==='AO'&&isRole('Admission Officer','Supervising Examiner'))aoPage();
@@ -144,7 +167,7 @@ function go(p){
 }
 /* ---------- session pages ---------- */
 function sessionPage(s){
-  PAGE=s;$('#main').innerHTML=`<h2>${s}</h2><div class="panel"><label for="ex">Examiner</label><select id="ex"><option value="">Choose an examiner</option>${USERS.map(u=>`<option value="${esc(u.email)}">${esc(u.name)}${u.role?' ('+esc(u.role)+')':''}</option>`).join('')}</select></div><div id="vt"></div>`;
+  PAGE=s;$('#main').innerHTML=`<h2>${s}</h2><div class="panel"><div class="fld" style="margin:0"><label for="ex">Examiner</label><select id="ex"><option value="">Choose an examiner</option>${USERS.map(u=>`<option value="${esc(u.email)}">${esc(u.name)}${u.role?' ('+esc(u.role)+')':''}</option>`).join('')}</select></div></div><div id="vt"></div>`;
   $('#ex').onchange=async e=>{
     if(!e.target.value){$('#vt').innerHTML='';return}
     try{const d=await call('view',{session:s,email:e.target.value});
@@ -217,5 +240,5 @@ async function usersPage(){
    $('#ul').onclick=async e=>{const d=e.target.dataset;if(!d.u)return;if(d.u==='remove'&&!confirm('Permanently delete '+d.e+'? This cannot be undone.'))return;
      try{await call('userAction',{email:d.e,act:d.u});USERS=await call('users');usersPage()}catch(x){err(x)}}}catch(e){err(e);$('#ul').textContent=e}
 }
-authUI();if(TOK)boot();
+themeUI();authUI();if(TOK)boot();
 </script></body></html>
