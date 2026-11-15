@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>DOST UGE Portal</title>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+:root{--c:#00AEEF;--k:#000;--w:#fff;--y:#FAC608;--line:rgba(0,174,239,.35);--dim:rgba(255,255,255,.62);--panel:#07131a}
+*{box-sizing:border-box}html,body{margin:0;height:100%}
+body{background:var(--k);color:var(--w);font:15px/1.5 'IBM Plex Sans',sans-serif;
+background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);background-size:48px 48px;background-position:-1px -1px;background-blend-mode:soft-light}
+body::before{content:"";position:fixed;inset:0;background:radial-gradient(circle at 50% 0,rgba(0,174,239,.16),#000 70%);z-index:-1}
+h1,h2,h3,.brand{font-family:'Chakra Petch',sans-serif;letter-spacing:.02em;margin:0}
+button,input,select{font:inherit}
+.btn{background:var(--c);color:#000;border:0;padding:9px 16px;font-weight:600;cursor:pointer;clip-path:polygon(8px 0,100% 0,100% calc(100% - 8px),calc(100% - 8px) 100%,0 100%,0 8px)}
+.btn:hover{background:var(--y)}.btn.ghost{background:transparent;color:var(--c);box-shadow:inset 0 0 0 1px var(--c)}
+.btn.ghost:hover{background:var(--c);color:#000}.btn.warn{background:var(--y)}.btn.sm{padding:5px 10px;font-size:13px}
+:focus-visible{outline:2px solid var(--y);outline-offset:2px}
+input,select{background:#000;color:var(--w);border:1px solid var(--c);padding:9px 11px;width:100%;border-radius:0}
+label{display:block;margin:12px 0 4px;color:var(--dim);font-size:13px}
+.msg{margin-top:12px;padding:9px 12px;border-left:3px solid var(--y);background:rgba(250,198,8,.1)}.msg.ok{border-color:var(--c);background:rgba(0,174,239,.12)}
+/* auth */
+#auth{min-height:100%;display:grid;place-items:center;padding:20px}
+.card{width:min(440px,100%);background:rgba(0,0,0,.85);border:1px solid var(--c);padding:28px;position:relative;box-shadow:0 0 40px rgba(0,174,239,.18)}
+.card::before,.card::after{content:"";position:absolute;width:18px;height:18px;border:3px solid var(--y)}
+.card::before{top:-3px;left:-3px;border-right:0;border-bottom:0}.card::after{bottom:-3px;right:-3px;border-left:0;border-top:0}
+.brand{font-size:26px;color:var(--c)}.brand b{color:var(--y)}.sub{color:var(--dim);margin:2px 0 18px}
+.tabs{display:flex;gap:4px;margin-bottom:6px;flex-wrap:wrap}.tabs button{background:none;border:0;border-bottom:2px solid transparent;color:var(--dim);padding:6px 10px;cursor:pointer}
+.tabs button.on{color:var(--w);border-color:var(--y)}
+.link{background:none;border:0;color:var(--c);cursor:pointer;padding:0;margin-top:12px;text-decoration:underline}
+/* app shell */
+#app{display:none;height:100%}
+header{display:flex;align-items:center;gap:12px;padding:10px 16px;border-bottom:1px solid var(--c);background:rgba(0,0,0,.9);position:sticky;top:0;z-index:5}
+header .t{flex:1;font-family:'Chakra Petch';font-size:18px}header .t b{color:var(--y)}
+.ico{background:none;border:1px solid var(--c);color:var(--c);width:40px;height:40px;font-size:20px;cursor:pointer}
+.ico:hover{background:var(--c);color:#000}
+.side{position:fixed;top:0;bottom:0;width:270px;background:var(--panel);border:solid var(--c);border-width:0 1px;z-index:8;padding:18px;transition:transform .25s;overflow:auto}
+#left{left:0;transform:translateX(-102%)}#right{right:0;transform:translateX(102%)}
+.side.open{transform:none}#scrim{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:7;display:none}#scrim.on{display:block}
+.nav a{display:block;padding:11px 12px;color:var(--w);text-decoration:none;border-left:3px solid transparent;cursor:pointer}
+.nav a:hover{background:rgba(0,174,239,.15)}.nav a.on{border-color:var(--y);background:rgba(0,174,239,.2);color:var(--y)}
+.nav h4{margin:18px 0 4px;color:var(--dim);font-weight:500;font-size:13px}
+main{padding:20px;max-width:1100px;margin:auto}
+.panel{background:rgba(0,0,0,.82);border:1px solid var(--line);padding:18px;margin-bottom:18px}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:end}.row>*{flex:1;min-width:130px}.row>.btn{flex:0 0 auto}
+.pill{display:inline-block;padding:2px 10px;border:1px solid var(--c);color:var(--c);font-size:13px}
+.pill.y{border-color:var(--y);color:var(--y)}
+.who{width:64px;height:64px;border:2px solid var(--y);display:grid;place-items:center;font:700 26px 'Chakra Petch';color:var(--y);margin-bottom:10px}
+/* tables */
+.wrap{overflow-x:auto}table{border-collapse:collapse;width:100%}
+th{background:var(--c);color:#000;text-align:left;padding:9px 10px;font-family:'Chakra Petch'}
+td{padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:middle}
+tr.rm td{background:rgba(250,198,8,.14);color:var(--y);font-weight:600}tr.det td{background:rgba(0,174,239,.08)}
+tr.dup td{background:rgba(250,198,8,.12)}
+.short{display:none}.sx{font-weight:600}.sx.m{color:var(--c)}.sx.f{color:#ff7ab8}
+.slot{width:110px;text-align:center}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:10px}
+.empty{color:var(--dim);padding:24px;text-align:center;border:1px dashed var(--line)}
+#toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:var(--y);color:#000;padding:10px 18px;z-index:20;display:none;font-weight:600;max-width:90vw}
+@media(min-width:1100px){#left,#right{transform:none}body.app main{margin:0 290px 0 290px;max-width:none}.ico{display:none}header{padding-left:290px;padding-right:290px}#scrim{display:none!important}}
+@media(max-width:700px){.full{display:none}.short{display:inline}
+.sx{display:inline-block;width:16px;height:16px;border-radius:50%;font-size:0;vertical-align:middle}.sx.m{background:var(--c)}.sx.f{background:#ff7ab8}
+td,th{padding:7px 6px;font-size:14px}main{padding:12px}.slot{width:84px}}
+@media(prefers-reduced-motion:reduce){.side{transition:none}}
+</style></head><body>
+
+<div id="auth"><div class="card">
+<div class="brand">DOST <b>UGE</b> Portal</div><p class="sub">Examination day coordination</p>
+<div class="tabs" id="tabs"></div>
+<div id="f"></div><div id="amsg"></div>
+</div></div>
+
+<div id="app">
+<header><button class="ico" id="mL" aria-label="Open pages">&#9776;</button><div class="t">DOST <b>UGE</b></div><button class="ico" id="mR" aria-label="Open profile">&#9679;</button></header>
+<aside class="side" id="left"><div class="brand" style="margin-bottom:12px">Pages</div><nav class="nav" id="nav"></nav></aside>
+<aside class="side" id="right"></aside><div id="scrim"></div>
+<main id="main"></main></div><div id="toast"></div>
+
+<script>
+const SESS=['Day 1 (AM)','Day 1 (PM)','Day 2 (AM)','Day 2 (PM)'],ROLES=['Supervising Examiner','Room Examiner','Admission Officer','Marshal','Janitor','Volunteer'];
+const $=s=>document.querySelector(s),esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let TOK='',ME=null,PAGE='',USERS=[],mode='login';
+try{TOK=sessionStorage.getItem('t')||''}catch(e){}
+const API='PASTE_YOUR_WEB_APP_URL_HERE'; // Apps Script Web app URL (ends with /exec)
+const call=async(fn,a={})=>{let r;try{const x=await fetch(API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({fn,t:TOK,a})});r=await x.json()}catch(e){throw 'Cannot reach the server. Check the API URL and your connection.'}if(!r.ok)throw r.e;return r.d};
+let tt;function toast(m){const t=$('#toast');t.textContent=m;t.style.display='block';clearTimeout(tt);tt=setTimeout(()=>t.style.display='none',3200)}
+const err=e=>toast(e);
+const isRole=(...r)=>ME&&ME.roleStatus==='approved'&&r.includes(ME.role);
+
+/* ---------- auth ---------- */
+const TABS={login:'Log in',signup:'Sign up',verify:'Verify email',forgot:'Forgot password'};
+function authUI(){
+  $('#tabs').innerHTML=Object.keys(TABS).map(k=>`<button class="${k===mode||(mode==='reset'&&k==='forgot')?'on':''}" data-m="${k}">${TABS[k]}</button>`).join('');
+  const em='<label for="em">Email address</label><input id="em" type="email" autocomplete="email">';
+  const pw=l=>`<label for="pw">${l}</label><input id="pw" type="password" autocomplete="current-password">`;
+  const cd='<label for="cd">6-digit code</label><input id="cd" inputmode="numeric" maxlength="6">';
+  const nm='<label for="nm">Full name</label><input id="nm" autocomplete="name">';
+  const B=(t)=>`<p><button class="btn" id="go">${t}</button></p>`;
+  $('#f').innerHTML={login:em+pw('Password')+B('Log in'),signup:nm+em+pw('Password (8+ characters)')+B('Create account')+'<p class="sub">A verification code is sent to dost.scholarships@ateneo.edu.</p>',
+   verify:em+cd+B('Verify email'),forgot:em+B('Send reset code')+'<button class="link" data-m="reset">I already have a code</button>',reset:em+cd+pw('New password')+B('Change password')}[mode];
+  $('#tabs').onclick=$('#f').onclick=e=>{const m=e.target.dataset.m;if(m){mode=m;$('#amsg').innerHTML='';authUI()}};
+  $('#go').onclick=submitAuth;
+}
+async function submitAuth(){
+  const g=i=>($('#'+i)||{}).value||'';const a={email:g('em'),password:g('pw'),name:g('nm'),code:g('cd')};
+  const msg=(t,ok)=>$('#amsg').innerHTML=`<div class="msg ${ok?'ok':''}">${esc(t)}</div>`;
+  $('#go').disabled=true;
+  try{
+    if(mode==='login'){const r=await call('login',a);TOK=r.token;ME=r.me;try{sessionStorage.setItem('t',TOK)}catch(e){}boot()}
+    else{const t=await call(mode,a);msg(t,1);if(mode==='signup')mode='verify',setTimeout(authUI,0),setTimeout(()=>msg(t,1),10);else if(mode==='reset'||mode==='verify'){mode='login';setTimeout(()=>{authUI();msg(t,1)},0)}}
+  }catch(e){msg(e)}
+  const b=$('#go');if(b)b.disabled=false;
+}
+/* ---------- shell ---------- */
+async function boot(){
+  try{ME=await call('me');USERS=await call('users')}catch(e){TOK='';authUI();return}
+  $('#auth').style.display='none';$('#app').style.display='block';document.body.classList.add('app');
+  nav();profile();go(PAGE||SESS[0]);
+}
+function nav(){
+  let h='<h4>Examination sessions</h4>'+SESS.map(s=>`<a data-p="${s}">${s}</a>`).join('');
+  if(isRole('Admission Officer','Supervising Examiner'))h+='<h4>Admission</h4><a data-p="AO">Admission desk</a>';
+  if(isRole('Supervising Examiner'))h+='<h4>Supervision</h4><a data-p="USERS">Users and roles</a>';
+  $('#nav').innerHTML=h;
+}
+function profile(){
+  const st=ME.roleStatus;
+  $('#right').innerHTML=`<div class="who">${esc((ME.name||'?')[0].toUpperCase())}</div><h3>${esc(ME.name)}</h3><div style="color:var(--dim);word-break:break-all">${esc(ME.email)}</div>
+  <p>${ME.role?`<span class="pill ${st==='approved'?'':'y'}">${esc(ME.role)} (${esc(st)})</span>`:'<span class="pill y">No role yet</span>'}${ME.owner?' <span class="pill">Owner</span>':''}</p>
+  <label for="rs">Assign yourself a role</label><select id="rs">${ROLES.map(r=>`<option ${r===ME.role?'selected':''}>${r}</option>`).join('')}</select>
+  <p><button class="btn sm" id="sr">Request role</button></p>
+  <p style="color:var(--dim);font-size:13px">${ME.owner?'Owner roles apply immediately.':'Role requests are sent to dost.scholarships@ateneo.edu for approval.'}</p>
+  <p><button class="btn ghost sm" id="lo">Log out</button></p>`;
+  $('#sr').onclick=async()=>{try{ME=await call('setRole',{role:$('#rs').value});toast(ME.roleStatus==='approved'?'Role set':'Role sent for approval');nav();profile();go(PAGE)}catch(e){err(e)}};
+  $('#lo').onclick=async()=>{try{await call('logout')}catch(e){}TOK='';try{sessionStorage.removeItem('t')}catch(e){}location.reload()};
+}
+const side=(id,on)=>{$(id).classList.toggle('open',on);$('#scrim').classList.toggle('on',on)};
+$('#mL').onclick=()=>side('#left',1);$('#mR').onclick=()=>side('#right',1);$('#scrim').onclick=()=>{side('#left',0);side('#right',0)};
+$('#nav').onclick=e=>{const p=e.target.dataset.p;if(p){go(p);side('#left',0)}};
+function go(p){
+  PAGE=p;document.querySelectorAll('#nav a').forEach(a=>a.classList.toggle('on',a.dataset.p===p));
+  if(SESS.includes(p))sessionPage(p);else if(p==='AO'&&isRole('Admission Officer','Supervising Examiner'))aoPage();
+  else if(p==='USERS'&&isRole('Supervising Examiner'))usersPage();else sessionPage(SESS[0]);
+}
+/* ---------- session pages ---------- */
+function sessionPage(s){
+  PAGE=s;$('#main').innerHTML=`<h2>${s}</h2><div class="panel"><label for="ex">Examiner</label><select id="ex"><option value="">Choose an examiner</option>${USERS.map(u=>`<option value="${esc(u.email)}">${esc(u.name)}${u.role?' ('+esc(u.role)+')':''}</option>`).join('')}</select></div><div id="vt"></div>`;
+  $('#ex').onchange=async e=>{
+    if(!e.target.value){$('#vt').innerHTML='';return}
+    try{const d=await call('view',{session:s,email:e.target.value});
+      if(!d.rooms.length){$('#vt').innerHTML='<div class="empty">This examiner has no testing room in this session.</div>';return}
+      $('#vt').innerHTML=d.rooms.map(r=>{const rs=d.rows.filter(x=>x.room===r);return `<div class="panel"><h3>Room ${String(r).padStart(2,'0')}</h3><div class="wrap"><table><tr><th><span class="full">Seat No.</span><span class="short">SN</span></th><th><span class="full">Examinee No.</span><span class="short">EN</span></th><th><span class="full">Full name</span><span class="short">Name</span></th><th>Sex</th></tr>${rs.length?rs.map(x=>`<tr><td>${x.seat}</td><td>${esc(x.tc)}</td><td>${esc(x.name)}</td><td><span class="sx ${x.sex==='M'?'m':'f'}" title="${x.sex==='M'?'Male':'Female'}">${esc(x.sex)}</span></td></tr>`).join(''):'<tr><td colspan="4" class="empty">No admitted examinees yet.</td></tr>'}</table></div></div>`}).join('')}catch(x){err(x)}};
+}
+/* ---------- admission desk ---------- */
+let S,D={rows:[],rooms:0,assign:[]},open=new Set(),conflict=null;
+const pad=n=>String(n).padStart(2,'0'),key=r=>pad(r.room)+'-'+pad(r.seat);
+function aoPage(){
+  S=S||SESS[0];
+  $('#main').innerHTML=`<h2>Admission desk</h2>
+  <div class="panel"><div class="row"><div><label for="as">Session</label><select id="as">${SESS.map(s=>`<option ${s===S?'selected':''}>${s}</option>`).join('')}</select></div>
+  <div><label for="fl">Excel or CSV file</label><input id="fl" type="file" accept=".csv,.xlsx,.xls"></div><button class="btn" id="up">Upload as this session</button></div>
+  <p style="color:var(--dim);margin:8px 0 0;font-size:13px">Columns: TC Examinee No., Full Name, Sex, Phone No. Uploading replaces this session's table.</p></div>
+  <div class="panel"><div class="row"><div><label for="nr">Testing rooms (TR) for this session</label><input id="nr" type="number" min="0" max="99"></div><button class="btn" id="sv">Save rooms and examiners</button></div><div class="grid" id="rg" style="margin-top:12px"></div></div>
+  <div class="panel"><div class="row"><div><label for="q">Search name</label><input id="q" placeholder="Any part of the name"></div><div><label for="fr">Room</label><select id="fr"></select></div><div><label for="fs">Seat</label><select id="fs"></select></div></div><div id="cb"></div><div class="wrap" id="tb" style="margin-top:12px"></div></div>`;
+  $('#as').onchange=e=>{S=e.target.value;conflict=null;load()};$('#up').onclick=upload;$('#sv').onclick=saveRooms;
+  ['q','fr','fs'].forEach(i=>$('#'+i).oninput=table);load();
+}
+async function load(){try{D=await call('getRoster',{session:S});open.clear();$('#nr').value=D.rooms;rooms();filters();table()}catch(e){err(e)}}
+function rooms(){const n=+$('#nr').value||0;$('#nr').onchange=()=>{D.rooms=+$('#nr').value||0;rooms()};
+  $('#rg').innerHTML=Array.from({length:n},(_,i)=>{const a=(D.assign.find(x=>x.room===i+1)||{}).email||'';return `<div><label>TR ${pad(i+1)} examiner</label><select data-r="${i+1}"><option value="">Unassigned</option>${USERS.map(u=>`<option value="${esc(u.email)}" ${u.email===a?'selected':''}>${esc(u.name)}</option>`).join('')}</select></div>`}).join('')}
+function filters(){const n=+D.rooms||0;$('#fr').innerHTML='<option value="">All rooms</option>'+Array.from({length:n},(_,i)=>`<option value="${i+1}">Room ${pad(i+1)}</option>`).join('');
+  $('#fs').innerHTML='<option value="">All seats</option>'+Array.from({length:30},(_,i)=>`<option value="${i+1}">Seat ${pad(i+1)}</option>`).join('')}
+async function saveRooms(){const n=+$('#nr').value||0,assign=[...document.querySelectorAll('#rg select')].map(s=>({room:s.dataset.r,email:s.value})).filter(x=>x.email);
+  try{await call('setRooms',{session:S,n,assign});toast('Rooms saved');load()}catch(e){err(e)}}
+function csv(t){const out=[];let r=[],c='',q=0;for(let i=0;i<t.length;i++){const ch=t[i];if(q){if(ch=='"'&&t[i+1]=='"'){c+='"';i++}else if(ch=='"')q=0;else c+=ch}else if(ch=='"')q=1;else if(ch==','){r.push(c);c=''}else if(ch=='\n'||ch=='\r'){if(ch=='\r'&&t[i+1]=='\n')i++;r.push(c);out.push(r);r=[];c=''}else c+=ch}if(c||r.length){r.push(c);out.push(r)}return out}
+async function upload(){
+  const f=$('#fl').files[0];if(!f)return toast('Choose a file first');
+  try{let m;const buf=await f.arrayBuffer();
+    if(/\.csv$/i.test(f.name))m=csv(new TextDecoder().decode(buf));else{const wb=XLSX.read(buf,{type:'array'});m=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{header:1,raw:false,defval:''})}
+    const nk=s=>String(s).toLowerCase().replace(/[^a-z0-9]/g,''),h=m[0].map(nk),ix=k=>h.indexOf(k);
+    const I={tc:ix('tcexamineeno'),name:ix('fullname'),sex:ix('sex'),phone:ix('phoneno')};
+    if(Object.values(I).some(v=>v<0))throw 'Missing column. Needed: TC Examinee No., Full Name, Sex, Phone No.';
+    const rows=m.slice(1).map(r=>({tc:String(r[I.tc]).trim(),name:String(r[I.name]).trim(),sex:String(r[I.sex]).trim().charAt(0).toUpperCase(),phone:String(r[I.phone]).trim()})).filter(r=>r.name);
+    if(!confirm(`Replace the ${S} table with ${rows.length} examinees?`))return;
+    await call('saveRoster',{session:S,rows});toast(rows.length+' examinees saved to '+S);$('#fl').value='';load()
+  }catch(e){err(e.message||e)}}
+function table(){
+  const q=$('#q').value.trim().toLowerCase(),fr=$('#fr').value,fs=$('#fs').value;
+  const cnt={};D.rows.filter(r=>r.admitted).forEach(r=>cnt[key(r)]=(cnt[key(r)]||0)+1);
+  const dup=Object.keys(cnt).filter(k=>cnt[k]>1);conflict=dup.length?dup:null;
+  let rs=D.rows;
+  if(conflict)rs=rs.filter(r=>r.admitted&&conflict.includes(key(r)));
+  else rs=rs.filter(r=>(!q||r.name.toLowerCase().includes(q))&&(!fr||r.room==fr)&&(!fs||r.seat==fs));
+  $('#cb').innerHTML=conflict?`<div class="msg">Two examinees share the same room and seat (${conflict.join(', ')}). Change either row to continue.</div>`:'';
+  const adm=D.rows.filter(r=>r.admitted).length;
+  $('#tb').innerHTML=D.rows.length?`<p style="margin:0 0 8px;color:var(--dim)">${adm} admitted of ${D.rows.length} examinees</p><table><tr><th></th><th>Full name</th><th>TC Examinee No.</th><th>Action</th><th>Room-Seat</th></tr>${rs.map(r=>{
+   const o=open.has(r.row);return `<tr class="${conflict?'dup':''}"><td><button class="btn ghost sm" data-d="${r.row}">${o?'Hide':'Details'}</button></td><td>${esc(r.name)}</td><td>${esc(r.tc)}</td>
+   <td>${r.admitted?`<button class="btn warn sm" data-w="${r.row}">Withdraw</button>`:`<button class="btn sm" data-a="${r.row}">Admit</button>`}</td>
+   <td>${r.admitted?`<input class="slot" data-e="${r.row}" value="${key(r)}" aria-label="Room-Seat">`:''}</td></tr>${o?`<tr class="det"><td></td><td colspan="4">Sex: <b>${esc(r.sex)}</b> &nbsp; Phone: <b>${esc(r.phone)}</b></td></tr>`:''}`}).join('')||'<tr><td colspan="5" class="empty">No matching examinees.</td></tr>'}</table>`:'<div class="empty">Upload a file to build this session\'s table.</div>';
+}
+document.addEventListener('click',async e=>{const d=e.target.dataset;if(!d||!$('#tb'))return;
+  try{if(d.d){const k=+d.d;open.has(k)?open.delete(k):open.add(k);table()}
+  else if(d.a){const r=await call('admit',{session:S,row:d.a});toast('Admitted to '+pad(r.room)+'-'+pad(r.seat));load()}
+  else if(d.w){await call('withdraw',{row:d.w});load()}}catch(x){err(x)}});
+document.addEventListener('change',async e=>{const row=e.target.dataset&&e.target.dataset.e;if(!row)return;
+  const m=e.target.value.match(/^\s*(\d{1,2})\s*-\s*(\d{1,2})\s*$/);if(!m){toast('Use the format 01-13');return load()}
+  try{await call('editSlot',{session:S,row,room:+m[1],seat:+m[2]});const r=D.rows.find(x=>x.row==row);r.admitted=true;r.room=+m[1];r.seat=+m[2];table();toast('Updated')}catch(x){err(x);load()}});
+/* ---------- users and roles ---------- */
+async function usersPage(){
+  $('#main').innerHTML='<h2>Users and roles</h2><div class="panel wrap" id="ul">Loading...</div>';
+  try{const L=await call('listUsers');
+   $('#ul').innerHTML=`<table><tr><th>Name</th><th>Role</th><th>Sessions and rooms</th><th>Status</th><th>Actions</th></tr>${L.map(u=>`<tr><td>${esc(u.name)}<br><small style="color:var(--dim)">${esc(u.email)}</small></td>
+   <td>${esc(u.role||'None')}${u.role?`<br><span class="pill ${u.roleStatus==='approved'?'':'y'}">${esc(u.roleStatus)}</span>`:''}</td>
+   <td>${u.assigned.length?u.assigned.map(a=>`${esc(a.session)}: ${a.rooms.map(pad).join(', ')}`).join('<br>'):'<span style="color:var(--dim)">Not assigned</span>'}</td>
+   <td><span class="pill ${u.status==='suspended'?'y':''}">${u.status==='suspended'?'Suspended':'Active'}</span></td>
+   <td>${u.owner?'<span style="color:var(--dim)">Owner</span>':`${u.roleStatus==='pending'?`<button class="btn sm" data-u="approve" data-e="${esc(u.email)}">Approve</button> `:''}${u.status==='suspended'?`<button class="btn sm" data-u="reactivate" data-e="${esc(u.email)}">Reactivate</button>`:`<button class="btn warn sm" data-u="suspend" data-e="${esc(u.email)}">Suspend</button>`} <button class="btn ghost sm" data-u="remove" data-e="${esc(u.email)}">Remove</button>`}</td></tr>`).join('')}</table>`;
+   $('#ul').onclick=async e=>{const d=e.target.dataset;if(!d.u)return;if(d.u==='remove'&&!confirm('Permanently delete '+d.e+'? This cannot be undone.'))return;
+     try{await call('userAction',{email:d.e,act:d.u});USERS=await call('users');usersPage()}catch(x){err(x)}}}catch(e){err(e);$('#ul').textContent=e}
+}
+authUI();if(TOK)boot();
+</script></body></html>
